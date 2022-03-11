@@ -1,14 +1,27 @@
 const ClientError = require('../../exceptions/ClientError');
 
 class AlbumsHandler {
-  constructor(albumsService, validator) {
-    this._albumsService = albumsService;
+  constructor(service, validator) {
+    this._service = service;
     this._validator = validator;
   }
 
   async postAlbumsHandler(request, h) {
     try {
-      this._validator;
+      this._validator.validateAlbumPayload(request.payload);
+      const { name = 'untitled', year } = request.payload;
+      const noteId = this._service.addAlbum(name, year);
+
+      const response = h.response({
+        satus: 'success',
+        message: 'Album berhasil ditambahkan',
+        data: {
+          noteId,
+        },
+      });
+
+      response.code(201);
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({
@@ -29,8 +42,6 @@ class AlbumsHandler {
       return response;
     }
   }
-  //   async getAlbumsByIdHandler() {}
-  //   async putAlbumsByIdHandler() {}
-  //   async deleteAlbumsByIdHandler() {}
 }
+
 module.exports = AlbumsHandler;
