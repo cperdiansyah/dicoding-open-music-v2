@@ -9,11 +9,11 @@ class SongsService {
     this._pool = new Pool();
   }
 
-  async addSong(title, year, performer, genre, duration) {
+  async addSong(title, year, performer, genre, duration, albumId = null) {
     const id = nanoid(16);
     const query = {
       text: 'INSERT INTO songs (id, title, year, performer, genre, duration, "albumId") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      values: [id, title, year, performer, genre, duration, ' '],
+      values: [id, title, year, performer, genre, duration, albumId],
     };
 
     const result = await this._pool.query(query);
@@ -36,6 +36,7 @@ class SongsService {
       values: [id],
     };
     const result = await this._pool.query(query);
+
     if (result.rows.length === 0) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }

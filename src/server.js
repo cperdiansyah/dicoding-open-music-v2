@@ -26,22 +26,6 @@ const init = async () => {
     },
   });
 
-  /*  await server.register(); */
-
-  /*   await server.register({
-    plugin: songs,
-    options: {
-      service: songsService,
-      validator: SongsValidator,
-    },
-    {
-      plugin: albums,
-      options: {
-        service: albumsService,
-        validator: AlbumsValidator,
-      },
-    }
-  }); */
   await server.register([
     {
       plugin: albums,

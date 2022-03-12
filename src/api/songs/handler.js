@@ -10,7 +10,7 @@ class SongsHandler {
     this._service = service;
     this._validator = validator;
 
-    // Agar this nya merujuk pada instance dari NotesService bukan object route
+    // Agar this nya merujuk pada instance dari SongsService bukan object route
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
@@ -30,6 +30,7 @@ class SongsHandler {
         genre,
         duration
       );
+      console.log(songId);
 
       const response = h.response({
         status: 'success',
