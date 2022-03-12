@@ -5,7 +5,7 @@ class AlbumsHandler {
     this._service = service;
     this._validator = validator;
 
-    /* this.postAlbumsHandler = this.postAlbumsHandler.bind(this);
+    /*   this.postAlbumsHandler = this.postAlbumsHandler.bind(this);
     this.getAlbumsHandler = this.getAlbumsHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
@@ -16,13 +16,13 @@ class AlbumsHandler {
     try {
       this._validator.validateAlbumPayload(request.payload);
       const { name = 'untitled', year } = request.payload;
-      const noteId = this._service.addAlbum(name, year);
+      const albumId = this._service.addAlbum(name, year);
 
       const response = h.response({
         satus: 'success',
         message: 'Album berhasil ditambahkan',
         data: {
-          noteId,
+          albumId,
         },
       });
 
@@ -63,15 +63,6 @@ class AlbumsHandler {
     try {
       const { id } = request.params;
       const album = await this._service.getAlbumById(id);
-      if (!album) {
-        const response = h.response({
-          status: 'error',
-          message: 'Album tidak ditemukan',
-        });
-        response.code(404);
-        return response;
-      }
-
       return {
         status: 'success',
         data: {

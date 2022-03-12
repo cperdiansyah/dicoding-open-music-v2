@@ -9,23 +9,24 @@ class SongsService {
     this._pool = new Pool();
   }
 
-  async addSong(name, title, year, performer, genre, duraion, albumId) {
+  async addSong(title, year, performer, genre, duration) {
     const id = nanoid(16);
     const query = {
-      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7)',
-      values: [id, name, title, year, performer, genre, duraion, albumId],
+      text: 'INSERT INTO songs (id, title, year, performer, genre, duration, "albumId") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      values: [id, title, year, performer, genre, duration, ' '],
     };
+
     const result = await this._pool.query(query);
 
-    if (!result.rowCount[0].id) {
+    if (!result.rows[0].id) {
       throw new InvariantError('Lagu gagal ditambahkan');
     }
-
     return result.rows[0].id;
   }
 
   async getSongs() {
     const result = await this._pool.query('SELECT * FROM songs');
+
     return result.rows;
   }
 
@@ -35,8 +36,7 @@ class SongsService {
       values: [id],
     };
     const result = await this._pool.query(query);
-
-    if (!result.rowCount[0].id) {
+    if (result.rows.length === 0) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
 
@@ -46,16 +46,20 @@ class SongsService {
   async editSongById(
     id,
     // eslint-disable-next-line comma-dangle
-    { name, title, year, performer, genre, duraion, albumId }
+    { title, year, performer, genre, duration, albumId }
   ) {
     const query = {
-      text: 'UPDATE songs SET name = $1, title = $2, year = $3, performer = $4, genre = $5, duraion = $6, albumId = $7 WHERE id = $8 RETURNING id',
-      values: [name, title, year, performer, genre, duraion, albumId, id],
+      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, "albumId" = $6 WHERE id = $7 RETURNING id',
+      values: [title, year, performer, genre, duration, albumId, id],
     };
+
+    console.log(query.values);
+
     const result = await this._pool.query(query);
+    console.log(result.rows[0]);
 
     if (!result.rows.length) {
-      throw new InvariantError('Lagu gagal diedit');
+      throw new NotFoundError('Lagu tidak ditemukan, gagal diedit');
     }
   }
 
@@ -67,7 +71,7 @@ class SongsService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new InvariantError('Lagu gagal dihapus');
+      throw new NotFoundError('Lagu gagal dihapus');
     }
   }
 }

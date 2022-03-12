@@ -1,3 +1,5 @@
+/* eslint-disable quotes */
+/* eslint-disable quote-props */
 /* eslint-disable camelcase */
 
 exports.shorthands = undefined;
@@ -8,8 +10,27 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
+    name: {
+      type: 'TEXT',
+      notNull: true,
+    },
+    year: {
+      type: 'INTEGER',
+      notNull: true,
+    },
+  });
+
+  pgm.createTable('songs', {
+    id: {
+      type: 'VARCHAR(50)',
+      primaryKey: true,
+    },
     title: {
       type: 'TEXT',
+      notNull: true,
+    },
+    year: {
+      type: 'INTEGER',
       notNull: true,
     },
     performer: {
@@ -22,15 +43,16 @@ exports.up = (pgm) => {
     },
     duration: {
       type: 'INTEGER',
-      notNull: true,
+      notNull: false,
     },
     albumId: {
       type: 'TEXT',
-      notNull: true,
+      notNull: false,
     },
   });
 };
 
 exports.down = (pgm) => {
   pgm.dropTable('albums');
+  pgm.dropTable('songs');
 };
