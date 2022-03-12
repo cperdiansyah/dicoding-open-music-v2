@@ -64,10 +64,10 @@ class SongsHandler {
 
   async getSongsHandler(request, h) {
     let songsResponse = await this._service.getSongs();
-    console.log(songsResponse);
+   
 
     const { title, performer } = request.query;
-    console.log(title, performer);
+   
 
     if (title !== undefined && performer !== undefined) {
       songsResponse = songsResponse.filter(
