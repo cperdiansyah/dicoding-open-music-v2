@@ -1,9 +1,4 @@
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable function-paren-newline */
 /* eslint-disable max-len */
-/* eslint-disable comma-dangle */
-/* eslint-disable operator-linebreak */
-/* eslint-disable object-curly-newline */
 const ClientError = require('../../exceptions/ClientError');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
@@ -24,8 +19,9 @@ class SongsHandler {
   async postSongHandler(request, h) {
     try {
       this._validator.validateSongPayload(request.payload);
-      const { title, year, performer, genre, duration, albumId } =
-        request.payload;
+      const {
+        title, year, performer, genre, duration, albumId,
+      } = request.payload;
 
       const songId = await this._service.addSong(
         title,
@@ -33,7 +29,7 @@ class SongsHandler {
         performer,
         genre,
         duration,
-        albumId
+        albumId,
       );
 
       const response = h.response({
@@ -75,19 +71,14 @@ class SongsHandler {
 
     if (title !== undefined && performer !== undefined) {
       songsResponse = songsResponse.filter(
-        (song) =>
-          song.title.toLowerCase().includes(title.toLowerCase()) &&
-          song.performer.toLowerCase().includes(performer.toLowerCase())
+        (song) => song.title.toLowerCase().includes(title.toLowerCase())
+          && song.performer.toLowerCase().includes(performer.toLowerCase()),
       );
     } else if (title !== undefined || performer !== undefined) {
       if (title !== undefined) {
-        songsResponse = songsResponse.filter((song) =>
-          song.title.toLowerCase().includes(title.toLowerCase())
-        );
+        songsResponse = songsResponse.filter((song) => song.title.toLowerCase().includes(title.toLowerCase()));
       } else if (performer !== undefined) {
-        songsResponse = songsResponse.filter((song) =>
-          song.performer.toLowerCase().includes(performer.toLowerCase())
-        );
+        songsResponse = songsResponse.filter((song) => song.performer.toLowerCase().includes(performer.toLowerCase()));
       }
     }
 
@@ -103,17 +94,6 @@ class SongsHandler {
     });
     response.code(200);
     return response;
-
-    /* return {
-      status: 'success',
-      data: {
-        songs: songsResponse.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
-      },
-    }; */
   }
 
   async getSongByIdHandler(request, h) {
