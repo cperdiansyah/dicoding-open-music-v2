@@ -1,3 +1,6 @@
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable function-paren-newline */
+/* eslint-disable max-len */
 /* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable object-curly-newline */
@@ -63,23 +66,54 @@ class SongsHandler {
     }
   }
 
-  async getSongsHandler() {
-    const songsResponse = await this._service.getSongs();
+  async getSongsHandler(request, h) {
+    let songsResponse = await this._service.getSongs();
+    console.log(songsResponse);
 
-    /* Destructing response to get 3 values ,
-    of all 7 values */
-    const songs = songsResponse.map((song) => ({
-      id: song.id,
-      title: song.title,
-      performer: song.performer,
-    }));
+    const { title, performer } = request.query;
+    console.log(title, performer);
 
-    return {
+    if (title !== undefined && performer !== undefined) {
+      songsResponse = songsResponse.filter(
+        (song) =>
+          song.title.toLowerCase().includes(title.toLowerCase()) &&
+          song.performer.toLowerCase().includes(performer.toLowerCase())
+      );
+    } else if (title !== undefined || performer !== undefined) {
+      if (title !== undefined) {
+        songsResponse = songsResponse.filter((song) =>
+          song.title.toLowerCase().includes(title.toLowerCase())
+        );
+      } else if (performer !== undefined) {
+        songsResponse = songsResponse.filter((song) =>
+          song.performer.toLowerCase().includes(performer.toLowerCase())
+        );
+      }
+    }
+
+    const response = h.response({
       status: 'success',
       data: {
-        songs,
+        songs: songsResponse.map((song) => ({
+          id: song.id,
+          title: song.title,
+          performer: song.performer,
+        })),
       },
-    };
+    });
+    response.code(200);
+    return response;
+
+    /* return {
+      status: 'success',
+      data: {
+        songs: songsResponse.map((song) => ({
+          id: song.id,
+          title: song.title,
+          performer: song.performer,
+        })),
+      },
+    }; */
   }
 
   async getSongByIdHandler(request, h) {
