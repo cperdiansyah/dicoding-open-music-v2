@@ -21,16 +21,17 @@ class SongsHandler {
   async postSongHandler(request, h) {
     try {
       this._validator.validateSongPayload(request.payload);
-      const { title, year, performer, genre, duration } = request.payload;
+      const { title, year, performer, genre, duration, albumId } =
+        request.payload;
 
       const songId = await this._service.addSong(
         title,
         year,
         performer,
         genre,
-        duration
+        duration,
+        albumId
       );
-      console.log(songId);
 
       const response = h.response({
         status: 'success',

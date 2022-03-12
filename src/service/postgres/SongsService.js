@@ -54,10 +54,7 @@ class SongsService {
       values: [title, year, performer, genre, duration, albumId, id],
     };
 
-    console.log(query.values);
-
     const result = await this._pool.query(query);
-    console.log(result.rows[0]);
 
     if (!result.rows.length) {
       throw new NotFoundError('Lagu tidak ditemukan, gagal diedit');
