@@ -25,8 +25,8 @@ class AlbumsService {
   }
 
   async getAlbums() {
-    const result = await this._pool.query('SELECT * FROM albums');
-    return result.rows;
+    const { rows } = await this._pool.query('SELECT * FROM albums');
+    return rows;
   }
 
   async getAlbumById(id) {
@@ -72,7 +72,7 @@ class AlbumsService {
     };
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Album gagal dihapus');
     }
   }

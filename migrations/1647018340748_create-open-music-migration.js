@@ -1,7 +1,3 @@
-/* eslint-disable quotes */
-/* eslint-disable quote-props */
-/* eslint-disable camelcase */
-
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
@@ -15,7 +11,7 @@ exports.up = (pgm) => {
       notNull: true,
     },
     year: {
-      type: 'INTEGER',
+      type: 'SMALLINT ',
       notNull: true,
     },
   });
@@ -30,7 +26,7 @@ exports.up = (pgm) => {
       notNull: true,
     },
     year: {
-      type: 'INTEGER',
+      type: 'SMALLINT ',
       notNull: true,
     },
     performer: {
