@@ -23,23 +23,8 @@ class SongsHandler {
   async postSongHandler(request, h) {
     try {
       this._validator.validateSongPayload(request.payload);
-      const { title, year, performer, genre, duration, albumId } =
-        request.payload;
-
-      /* Saya sudah coba pakai cara yg disarankan, hasilnya banyak yang failed. Akhirnya saya tetap pakai cara lama
       
       const songId = await this._service.addSong(request.payload);
-      */
-
-      const songId = await this._service.addSong(
-        title,
-        year,
-        performer,
-        genre,
-        duration,
-        albumId
-      );
-
       const response = h.response({
         status: 'success',
         message: 'Lagu berhasil ditambahkan',
@@ -84,11 +69,7 @@ class SongsHandler {
     const response = h.response({
       status: 'success',
       data: {
-        songs: songsResponse.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
+        songs: songsResponse,
       },
     });
     response.code(200);

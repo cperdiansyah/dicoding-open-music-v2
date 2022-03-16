@@ -9,7 +9,8 @@ class SongsService {
     this._pool = new Pool();
   }
 
-  async addSong(title, year, performer, genre, duration, albumId = null) {
+  async addSong(request) {
+    const { title, year, performer, genre, duration, albumId = null } = request;
     const id = nanoid(16);
     const query = {
       text: 'INSERT INTO songs (id, title, year, performer, genre, duration, "albumId") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
@@ -25,7 +26,9 @@ class SongsService {
   }
 
   async getSongs() {
-    const result = await this._pool.query('SELECT * FROM songs');
+    const result = await this._pool.query(
+      'SELECT id, title, performer FROM songs'
+    );
 
     return result.rows;
   }
