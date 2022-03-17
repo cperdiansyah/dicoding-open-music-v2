@@ -33,8 +33,16 @@ exports.up = (pgm) => {
       notNull: false,
     },
   });
+
+  // memberikan constraint foreign key pada owner terhadap kolom id dari tabel albums
+  pgm.addConstraint(
+    'songs',
+    'fk_albums.albums.id',
+    'FOREIGN KEY("albumId") REFERENCES albums(id) ON DELETE CASCADE'
+  );
 };
 
 exports.down = (pgm) => {
   pgm.dropTable('songs');
+  pgm.dropConstraint('songs', 'fk_albums.albums.id');
 };
