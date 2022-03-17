@@ -26,8 +26,8 @@ class PlaylistService {
   async getPlaylists(owner) {
     const query = {
       text: `
-        SELECT playlists.*, users.* FROM playlists
-        JOIN users ON playlists.owner = users.id
+        SELECT playlists.*, users.username FROM playlists
+        INNER JOIN users ON playlists.owner = users.id
         WHERE owner = $1`,
       values: [owner],
     };
@@ -41,11 +41,34 @@ class PlaylistService {
     return result.rows;
   }
 
-  async getPlaylistById(id) {}
+  async getPlaylistById(id) {
+    const query = {
+      text: `
+        SELECT playlists.*, users.username FROM playlists 
+        INNER JOIN users ON playlists.owner = users.id
+        WHERE playlists.id = $1
+      `,
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+    return result.rows[0];
+  }
 
-  async editPlaylistById(id) {}
+  async deletePlaylistById(id) {
+    const query = {
+      text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
+      values: [id],
+    };
 
-  async deletePlaylistById(id) {}
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
+    }
+  }
 
   async verifyPlaylistOwner(id, owner) {
     const query = {

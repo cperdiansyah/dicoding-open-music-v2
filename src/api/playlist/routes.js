@@ -24,14 +24,6 @@ const routes = (handler) => [
     },
   },
   {
-    method: 'PUT',
-    path: '/playlists/{id}',
-    handler: handler.putPlaylistByIdHandler,
-    options: {
-      auth: 'musicapp_jwt',
-    },
-  },
-  {
     method: 'DELETE',
     path: '/playlists/{id}',
     handler: handler.deletePlaylistByIdHandler,
