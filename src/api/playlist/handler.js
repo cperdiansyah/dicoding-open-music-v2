@@ -1,10 +1,10 @@
 const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsHandler {
-  constructor(playlistsService, usersService, validator) {
-    this._playlistsService = playlistsService;
+  constructor(service, validator) {
+    this._service = service;
     this._validator = validator;
-    this._usersService = usersService;
+    // this._usersService = usersService;
 
     this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
     this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
@@ -57,9 +57,7 @@ class PlaylistsHandler {
     try {
       const { id: credentialId } = request.auth.credentials;
 
-      const playlistsMap = await this._playlistsService.getPlaylists(
-        credentialId
-      );
+      const playlistsMap = await this._service.getPlaylists(credentialId);
 
       return {
         status: 'success',
@@ -97,8 +95,8 @@ class PlaylistsHandler {
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
-      await this._playlistsService.verifyPlaylistAccess(id, credentialId);
-      const playlist = await this._playlistsService.getPlaylistById(id);
+      await this._service.verifyPlaylistAccess(id, credentialId);
+      const playlist = await this._service.getPlaylistById(id);
 
       return {
         status: 'success',
@@ -132,8 +130,8 @@ class PlaylistsHandler {
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
-      await this._playlistsService.verifyPlaylistOwner(id, credentialId);
-      await this._playlistsService.deletePlaylistById(id);
+      await this._service.verifyPlaylistOwner(id, credentialId);
+      await this._service.deletePlaylistById(id);
       return {
         status: 'success',
         message: 'Playlist berhasil dihapus',
