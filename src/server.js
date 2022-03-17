@@ -24,6 +24,10 @@ const AuthenticationsService = require('./service/postgres/AuthenticationsServic
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+const playlists = require('./api/playlist');
+const PlaylistsService = require('./service/postgres/PlaylistsService');
+const PlaylistsValidator = require('./validator/playlists');
+
 require('dotenv').config();
 
 const init = async () => {
@@ -31,6 +35,7 @@ const init = async () => {
   const albumsService = new AlbumsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
+  const playlistsService = new PlaylistsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -94,6 +99,14 @@ const init = async () => {
         usersService,
         tokenManager: TokenManager,
         validator: AuthenticationsValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        playlistsService,
+        usersService,
+        validator: PlaylistsValidator,
       },
     },
   ]);

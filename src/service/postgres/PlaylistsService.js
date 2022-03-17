@@ -1,5 +1,7 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistService {
   constructor() {
@@ -23,7 +25,10 @@ class PlaylistService {
 
   async getPlaylists(owner) {
     const query = {
-      text: 'SELECT id, name FROM playlists WHERE owner = $1',
+      text: `
+        SELECT playlists.*, users.* FROM playlists
+        JOIN users ON playlists.owner = users.id
+        WHERE owner = $1`,
       values: [owner],
     };
 
@@ -41,6 +46,21 @@ class PlaylistService {
   async editPlaylistById(id) {}
 
   async deletePlaylistById(id) {}
+
+  async verifyPlaylistOwner(id, owner) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+    const playlist = result.rows[0];
+    if (playlist.owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
 }
 
 module.exports = PlaylistService;
