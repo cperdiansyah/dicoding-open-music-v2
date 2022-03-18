@@ -121,10 +121,12 @@ class PlaylistService {
   async getActivities(playlistId) {
     const query = {
       text: `
-        SELECT activities.*, users.username FROM activities
+        SELECT activities.*, users.username, songs.title
+        FROM activities
         LEFT JOIN users ON activities.user_id = users.id
+        LEFT JOIN songs ON activities.song_id = songs.id
         WHERE activities.playlist_id = $1
-        ORDER BY activities.time DESC
+        ORDER BY activities.time ASC
       `,
       values: [playlistId],
     };
@@ -133,11 +135,11 @@ class PlaylistService {
     return result.rows;
   }
 
-  async postActivity(playlistId, songId, userId, action, time) {
+  async postActivity(playlistId, songId, userId, action) {
     const date = new Date().toISOString();
     const query = {
       text: `
-      INSERT INTO activities VALUES($1, $2, $3, $4,$5) RETURNING id
+      INSERT INTO activities VALUES($1, $2, $3, $4, $5, $6) RETURNING id
       `,
       values: [nanoid(16), playlistId, songId, userId, action, date],
     };

@@ -131,7 +131,6 @@ class PlaylistsHandler {
 
   async postSongToplaylistHandler(request, h) {
     try {
-      
       this._validator.validatePostSongPayload(request.payload);
 
       const { playlistId } = request.params;
@@ -261,11 +260,18 @@ class PlaylistsHandler {
 
       const activities = await this._service.getActivities(playlistId);
 
+      const activityResponse = activities.map((activity) => ({
+        username: activity.username,
+        title: activity.title,
+        action: activity.action,
+        time: activity.time,
+      }));
+
       return {
         status: 'success',
         data: {
           playlistId,
-          activities,
+          activities: activityResponse,
         },
       };
     } catch (error) {
