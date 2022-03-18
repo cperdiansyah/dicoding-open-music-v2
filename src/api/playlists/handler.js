@@ -1,4 +1,6 @@
 const ClientError = require('../../exceptions/ClientError');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class PlaylistsHandler {
   constructor(service, validator) {
@@ -9,8 +11,10 @@ class PlaylistsHandler {
     this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
     this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
     this.postSongToplaylistHandler = this.postSongToplaylistHandler.bind(this);
-    this.getSongsWithPlaylistHandler = this.getSongsWithPlaylistHandler.bind(this);
-    this.deleteSongByFromPlaylistHandler = this.deleteSongByFromPlaylistHandler.bind(this);
+    this.getSongsWithPlaylistHandler =
+      this.getSongsWithPlaylistHandler.bind(this);
+    this.deleteSongByFromPlaylistHandler =
+      this.deleteSongByFromPlaylistHandler.bind(this);
   }
   /* Playlist handler */
   async postPlaylistHandler(request, h) {
@@ -128,12 +132,12 @@ class PlaylistsHandler {
   async postSongToplaylistHandler(request, h) {
     try {
       this._validator.validatePostSongPayload(request.payload);
+
       const { playlistId } = request.params;
       const { songId } = request.payload;
       const { id: credentialId } = request.auth.credentials;
 
       await this._service.verifyPlaylistAccess(playlistId, credentialId);
-
       await this._service.addSongToPlaylist(playlistId, songId);
 
       const response = h.response({
@@ -148,6 +152,7 @@ class PlaylistsHandler {
           status: 'fail',
           message: error.message,
         });
+
         response.code(error.statusCode);
         return response;
       }
@@ -170,11 +175,14 @@ class PlaylistsHandler {
 
       await this._service.verifyPlaylistAccess(playlistId, credentialId);
 
+      const playlist =  await this._service.getPlaylistById(playlistId);
+
       const songs = await this._service.getSongsFromPlaylist(playlistId);
+      
       return {
         status: 'success',
         data: {
-          songs,
+          playlist: { ...playlist, songs },
         },
       };
     } catch (error) {

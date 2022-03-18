@@ -13,6 +13,7 @@ const PlaylistsValidator = {
   },
   validatePostSongPayload: (payload) => {
     const validationResult = PostSongPayloadSchema.validate(payload);
+    
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
