@@ -25,7 +25,6 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('playlists');
-
   pgm.dropConstraint('playlists', 'fk_users.owner_users.id');
+  pgm.dropTable('playlists');
 };

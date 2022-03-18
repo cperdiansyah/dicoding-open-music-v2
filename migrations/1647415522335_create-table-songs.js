@@ -43,6 +43,6 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('songs');
   pgm.dropConstraint('songs', 'fk_albums.albums.id');
+  pgm.dropTable('songs');
 };
