@@ -4,6 +4,7 @@ class CollaborationsHandler {
   constructor(collaborationsService, playlistsService, validator) {
     this._collaborationsService = collaborationsService;
     this._playlistsService = playlistsService;
+    this._playlistsService._collaborationService = collaborationsService;
     this._validator = validator;
 
     this.postCollaborationHandler = this.postCollaborationHandler.bind(this);
@@ -16,13 +17,16 @@ class CollaborationsHandler {
       this._validator.validateCollaborationPayload(request.payload);
       const { id: credentialId } = request.auth.credentials;
       const { playlistId, userId } = request.payload;
-      
-      this._service.verifyRequest(userId, playlistId);
 
       await this._playlistsService.verifyPlaylistOwner(
         playlistId,
         credentialId
       );
+
+      /* Verifikasi data user dan Playlist ada di database*/
+      await this._collaborationsService.verifyUser(userId);
+      await this._collaborationsService.verifyPlaylist(playlistId);
+
       const collaborationId =
         await this._collaborationsService.addCollaboration(playlistId, userId);
 
@@ -62,12 +66,15 @@ class CollaborationsHandler {
       const { id: credentialId } = request.auth.credentials;
       const { playlistId, userId } = request.payload;
 
-      this._service.verifyRequest(userId, playlistId);
-
       await this._playlistsService.verifyPlaylistOwner(
         playlistId,
         credentialId
       );
+      
+      /* Verifikasi data user dan Playlist ada di database*/
+      await this._collaborationsService.verifyUser(userId);
+      await this._collaborationsService.verifyPlaylist(playlistId);
+
       await this._collaborationsService.deleteCollaboration(playlistId, userId);
 
       return {

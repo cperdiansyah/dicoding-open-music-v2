@@ -27,20 +27,17 @@ class PlaylistService {
   }
 
   async getPlaylists(owner) {
+
     const query = {
       text: `
         SELECT playlists.*, users.username FROM playlists
         LEFT JOIN users ON playlists.owner = users.id
         LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
-        WHERE owner = $1`,
+        WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
       values: [owner],
     };
 
     const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Playlist tidak ditemukan');
-    }
 
     return result.rows;
   }

@@ -34,22 +34,28 @@ class CollaborationsService {
     }
   }
 
-  async verifyRequest(usersId, playlistsId) {
-    const queryUser = {
+  async verifyUser(userId) {
+    const query = {
       text: 'SELECT * FROM users WHERE id = $1',
-      values: [usersId],
+      values: [userId],
     };
-    const resultUser = await this._pool.query(queryUser);
+    const result = await this._pool.query(query);
 
-    const queryPlaylist = {
+    if (!result.rows.length) {
+      throw new NotFoundError('User tidak ditemukan');
+    }
+  }
+
+  async verifyPlaylist(playlistsId) {
+    const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
       values: [playlistsId],
     };
 
-    const resultplaylist = await this._pool.query(queryPlaylist);
+    const result = await this._pool.query(query);
 
-    if (!resultUser.rows.length && !resultplaylist.rows.length) {
-      throw new NotFoundError('Data tidak ditemukan');
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
     }
   }
 
