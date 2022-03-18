@@ -2,14 +2,19 @@ const routes = (handler) => [
   /* Routes For Collaborations */
   {
     method: 'POST',
-    path: '/colaborations',
-    handler: () => {},
+    path: '/collaborations',
+    handler: handler.postCollaborationHandler,
+    options: {
+      auth: 'musicapp_jwt',
+    },
   },
-
   {
     method: 'DELETE',
-    path: '/colaborations/{id}',
-    handler: () => {},
+    path: '/collaborations',
+    handler: handler.deleteCollaborationHandler,
+    options: {
+      auth: 'musicapp_jwt',
+    },
   },
 ];
 module.exports = routes;
