@@ -5,12 +5,13 @@ const AuthorizationError = require('../../exceptions/AuthorizationError');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class PlaylistService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
   }
   /* Service for playlist */
 
-  async addPlaylist({ name, owner }) {
+  async addPlaylist(name, owner) {
     const query = {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
       values: [nanoid(16), name, owner],
@@ -29,7 +30,8 @@ class PlaylistService {
     const query = {
       text: `
         SELECT playlists.*, users.username FROM playlists
-        INNER JOIN users ON playlists.owner = users.id
+        LEFT JOIN users ON playlists.owner = users.id
+        LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
         WHERE owner = $1`,
       values: [owner],
     };
@@ -47,7 +49,9 @@ class PlaylistService {
     const query = {
       text: `
         SELECT playlists.*, users.username FROM playlists 
-        INNER JOIN users ON playlists.owner = users.id
+        LEFT JOIN users ON playlists.owner = users.id
+        LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
+
         WHERE playlists.id = $1
       `,
       values: [id],
@@ -110,6 +114,38 @@ class PlaylistService {
 
     if (!result.rows.length) {
       throw new InvariantError('Lagu gagal dihapus');
+    }
+  }
+
+  /* Activities */
+  async getActivities(playlistId) {
+    const query = {
+      text: `
+        SELECT activities.*, users.username FROM activities
+        LEFT JOIN users ON activities.user_id = users.id
+        WHERE activities.playlist_id = $1
+        ORDER BY activities.time DESC
+      `,
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+
+  async postActivity(playlistId, songId, userId, action, time) {
+    const date = new Date().toISOString();
+    const query = {
+      text: `
+      INSERT INTO activities VALUES($1, $2, $3, $4,$5) RETURNING id
+      `,
+      values: [nanoid(16), playlistId, songId, userId, action, date],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Aktifitas gagal ditambahkan');
     }
   }
 

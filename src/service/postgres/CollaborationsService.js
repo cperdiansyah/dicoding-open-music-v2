@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
   constructor() {
@@ -7,8 +8,6 @@ class CollaborationsService {
   }
 
   async addCollaboration(playlistId, userId) {
-
-
     const query = {
       text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
       values: [nanoid(16), playlistId, userId],
@@ -32,6 +31,25 @@ class CollaborationsService {
 
     if (!result.rows.length) {
       throw new InvariantError('Kolaborasi gagal dihapus');
+    }
+  }
+
+  async verifyRequest(usersId, playlistsId) {
+    const queryUser = {
+      text: 'SELECT * FROM users WHERE id = $1',
+      values: [usersId],
+    };
+    const resultUser = await this._pool.query(queryUser);
+
+    const queryPlaylist = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [playlistsId],
+    };
+
+    const resultplaylist = await this._pool.query(queryPlaylist);
+
+    if (!resultUser.rows.length && !resultplaylist.rows.length) {
+      throw new NotFoundError('Data tidak ditemukan');
     }
   }
 
